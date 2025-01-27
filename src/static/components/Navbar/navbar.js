@@ -30,7 +30,7 @@ class Navbar extends HTMLElement {
           <a href="/audio">Audio</a>
           <a href="/drag">Drag and drop</a>
           <a href="/tictactoe">Tic Tac Toe</a>
-          <a href="/admin" target="_blank">Administrar articulos</a>
+          <a href="/admin" target="_blank">Administrar artículos</a>
         </nav>
       </header>
     `
