@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='/assets/arviixzuh.ico') }}"
+      type="image/x-icon"
+    />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <title>Blog Admin</title>
+  </head>
+  <body>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+      :root {
+        --text: #11181c;
+        --danger: #f31260;
+        --radius: 8px;
+        --border: #e4e4e7;
+        --surface: #f4f4f5;
+        --primary: #0070f3;
+        --transition: all 0.2s ease;
+        --background: #ffffff;
+        --danger-hover: #e60f5c;
+        --primary-hover: #0061d5;
+        --text-secondary: #687076;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+      body {
+        color: var(--text);
+        line-height: 1.5;
+        background-color: var(--background);
+      }
+      .container {
+        margin: 0 auto;
+        padding: 2rem;
+        max-width: 1200px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        justify-content: space-between;
+      }
+      h1 {
+        color: var(--text);
+        font-size: 2rem;
+        font-weight: 700;
+      }
+      .search-container {
+        gap: 0.5rem;
+        display: flex;
+      }
+      input[type='text'],
+      input[type='url'],
+      textarea {
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        border-radius: var(--radius);
+        background-color: var(--surface);
+      }
+      input[type='text']:focus,
+      input[type='url']:focus,
+      textarea:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.1);
+        border-color: var(--primary);
+      }
+      .table-actions {
+        display: flex;
+        margin-bottom: 1rem;
+        justify-content: space-between;
+      }
+      .table-container {
+        overflow: hidden;
+        box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+        border-radius: var(--radius);
+        background-color: var(--background);
+      }
+      table {
+        width: 100%;
+        border-spacing: 0;
+        border-collapse: separate;
+      }
+      th {
+        border-bottom: 1px solid var(--border);
+      }
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        align-items: center;
+        justify-content: center;
+      }
+      th {
+        color: var(--text);
+        font-weight: 600;
+        background-color: var(--surface);
+      }
+      td {
+        color: var(--text-secondary);
+      }
+      .btn-primary,
+      .btn-secondary,
+      .btn-danger,
+      .btn-flat {
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        font-weight: 500;
+        border-radius: var(--radius);
+      }
+      .btn-primary {
+        color: white;
+        background-color: var(--primary);
+      }
+      .btn-primary:hover {
+        background-color: var(--primary-hover);
+      }
+      .btn-secondary {
+        color: var(--text);
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+      }
+      .btn-secondary:hover {
+        background-color: var(--border);
+      }
+      .btn-danger {
+        color: white;
+        background-color: var(--danger);
+      }
+      .btn-danger:hover {
+        background-color: var(--danger-hover);
+      }
+      .btn-flat {
+        color: var(--text);
+        background-color: transparent;
+      }
+      .btn-flat:hover {
+        background-color: var(--surface);
+      }
+      .modal {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        opacity: 0;
+        position: fixed;
+        background: rgba(0, 0, 0, 0.3);
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0s ease 0.3s;
+        align-items: center;
+        backdrop-filter: blur(15px);
+        justify-content: center;
+      }
+      .modal.open {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease, visibility 0s ease 0s;
+      }
+      .modal-content {
+        width: 100%;
+        margin: 2rem auto;
+        padding: 2rem;
+        position: relative;
+        max-width: 500px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-radius: var(--radius);
+        background-color: var(--background);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        justify-content: space-between;
+      }
+      .close {
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        color: var(--text);
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-actions {
+        gap: 1rem;
+        display: flex;
+        margin-top: 1.5rem;
+      }
+      .tag {
+        color: var(--primary);
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.25rem;
+        border-radius: var(--radius);
+        background-color: var(--surface);
+      }
+      .article-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: var(--radius);
+      }
+      .action-buttons {
+        height: 100%;
+        justify-content: center;
+        display: flex;
+      }
+    </style>
+    <div class="container">
+      <main>
+        <div class="table-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar artículos..." />
+            <button id="searchBtn" class="btn-primary"><i class="bx bx-search-alt-2"></i></button>
+          </div>
+          <button id="newArticleBtn" class="btn-primary">
+            <i class="bx bx-plus"></i> Nuevo Artículo
+          </button>
+        </div>
+        <div class="table-container">
+          <table id="articlesTable">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Imagen</th>
+                <th>Etiquetas</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="articlesBody"></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+    <div id="articleModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Nuevo Artículo</h2>
+          <span class="close">&times;</span>
+        </div>
+        <form id="articleForm">
+          <input type="hidden" id="articleId" />
+          <div class="form-group">
+            <label for="title">Título</label>
+            <input type="text" id="title" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea id="description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="image">URL de la imagen</label>
+            <input type="url" id="image" required />
+          </div>
+          <div class="form-group">
+            <label for="tags">Etiquetas (separadas por comas)</label>
+            <input type="text" id="tags" required />
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar</button>
+            <button type="button" class="btn-flat" onclick="closeModal()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="confirmModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Confirmar Eliminación</h2>
+          <span class="close" onclick="closeConfirmModal()">&times;</span>
+        </div>
+        <p>¿Estás seguro de que deseas eliminar este artículo?</p>
+        <div class="form-actions">
+          <button id="confirmDelete" class="btn-danger">Eliminar</button>
+          <button onclick="closeConfirmModal()" class="btn-flat">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      let articles = []
+      const articlesBody = document.getElementById('articlesBody')
+      const articleModal = document.getElementById('articleModal')
+      const confirmModal = document.getElementById('confirmModal')
+      const articleForm = document.getElementById('articleForm')
+      const searchInput = document.getElementById('searchInput')
+      const searchBtn = document.getElementById('searchBtn')
+
+      document.getElementById('newArticleBtn').addEventListener('click', () => openModal())
+      document.querySelector('.close').addEventListener('click', closeModal)
+      articleForm.addEventListener('submit', saveArticle)
+      searchBtn.addEventListener('click', searchArticles)
+      searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') searchArticles()
+      })
+
+      function openModal(article = null) {
+        if (article) {
+          document.getElementById('modalTitle').textContent = 'Editar Artículo'
+          document.getElementById('articleId').value = article.id
+          document.getElementById('title').value = article.title
+          document.getElementById('description').value = article.description
+          document.getElementById('image').value = article.image
+          document.getElementById('tags').value = article.tags
+        } else {
+          document.getElementById('modalTitle').textContent = 'Nuevo Artículo'
+          articleForm.reset()
+          document.getElementById('articleId').value = ''
+        }
+        articleModal.classList.add('open')
+      }
+
+      function closeModal() {
+        articleModal.classList.remove('open')
+      }
+
+      function closeConfirmModal() {
+        confirmModal.classList.remove('open')
+      }
+
+      async function saveArticle(e) {
+        e.preventDefault()
+        const id = document.getElementById('articleId').value
+        const article = {
+          title: document.getElementById('title').value,
+          description: document.getElementById('description').value,
+          image: document.getElementById('image').value,
+          tags: document.getElementById('tags').value,
+        }
+
+        try {
+          let response
+          if (id) {
+            response = await fetch(`/articles/${id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(article),
+            })
+          } else {
+            response = await fetch('/articles', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(article),
+            })
+          }
+
+          if (!response.ok) {
+            throw new Error('Error al guardar el artículo')
+          }
+
+          closeModal()
+          await fetchArticles()
+        } catch (error) {
+          console.error('Error:', error)
+        }
+      }
+
+      function confirmDelete(id) {
+        confirmModal.classList.add('open')
+        document.getElementById('confirmDelete').onclick = () => deleteArticle(id)
+      }
+
+      async function deleteArticle(id) {
+        try {
+          const response = await fetch(`/articles/${id}`, {
+            method: 'DELETE',
+          })
+
+          if (!response.ok) {
+            throw new Error('Error al eliminar el artículo')
+          }
+
+          closeConfirmModal()
+          await fetchArticles()
+        } catch (error) {
+          console.error('Error:', error)
+        }
+      }
+
+      function renderArticles(articlesToRender) {
+        articlesBody.innerHTML = ''
+        articlesToRender.forEach((article) => {
+          const row = document.createElement('tr')
+          row.innerHTML = `
+      <td>${article.title}</td>
+      <td>${article.description.substring(0, 100)}${
+            article.description.length > 100 ? '...' : ''
+          }</td>
+      <td><img src="${article.image}" alt="${article.title}" class="article-image"></td>
+      <td>
+        ${String(article.tags)
+          .split(',')
+          .map((tag) => `<span class="tag">${tag.trim()}</span>`)
+          .join(' ')}
+      </td>
+      <td class="action-buttons">
+        <button class="btn-flat" onclick='openModal(${JSON.stringify(
+          article
+        )})'><i class='bx bx-edit-alt'></i></button>
+        <button class="btn-flat" onclick='confirmDelete("${
+          article.id
+        }")'><i class='bx bx-trash'></i></button>
+      </td>
+    `
+          articlesBody.appendChild(row)
+        })
+      }
+
+      async function fetchArticles() {
+        try {
+          const response = await fetch('/articles')
+          if (!response.ok) {
+            throw new Error('Error al obtener los artículos')
+          }
+          articles = await response.json()
+          renderArticles(articles)
+        } catch (error) {
+          console.error('Error:', error)
+        }
+      }
+
+      function searchArticles() {
+        const searchTerm = searchInput.value.toLowerCase()
+        const filteredArticles = articles.filter(
+          (article) =>
+            article.title.toLowerCase().includes(searchTerm) ||
+            article.description.toLowerCase().includes(searchTerm) ||
+            article.tags.split(',').some((tag) => tag.toLowerCase().includes(searchTerm))
+        )
+        renderArticles(filteredArticles)
+      }
+      fetchArticles()
+    </script>
+  </body>
+</html>

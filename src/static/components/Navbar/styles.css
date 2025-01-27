@@ -1,0 +1,56 @@
+.header {
+  gap: 30px;
+  display: flex;
+  user-select: none;
+  flex-direction: column;
+}
+
+.preNavbar {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.preNavbarIcons {
+  gap: 15px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.preNavbar > a {
+  color: white;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.navbar a.active {
+  color: var(--secondary);
+  border-bottom: 2px solid var(--secondary);
+}
+
+.icon {
+  color: rgb(202, 191, 207);
+  font-size: 25px;
+}
+
+.navbar {
+  gap: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 2px solid var(--primary);
+  flex-direction: row;
+}
+
+.navbar a {
+  color: white;
+  font-size: 15px;
+  transition: border-bottom 300ms ease;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+}
+
+.navbar a:hover {
+  border-bottom: 2px solid var(--secondary);
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/components/Navbar/styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/index.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/theme.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/webkit.css') }}" />
+    <title>List</title>
+  </head>
+  <style>
+    .listboxContainer {
+      gap: 15px;
+      display: flex;
+    }
+    .listboxWrapper {
+      color: var(--text);
+      width: 50%;
+      border: 1px solid var(--default);
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .listboxItem {
+      color: var(--text);
+      cursor: pointer;
+      padding: 5px;
+      transition: background-color 300ms ease;
+      border-radius: 5px;
+      list-style-position: inside;
+    }
+    .listboxItem:hover {
+      background-color: var(--default);
+    }
+  </style>
+  <body>
+    <main>
+      <layout-component title="Lista de datos">
+        <div class="listboxContainer">
+          <ol class="listboxWrapper">
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+          </ol>
+          <ul class="listboxWrapper">
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+            <li class="listboxItem">Dato</li>
+          </ul>
+        </div>
+      </layout-component>
+    </main>
+  </body>
+  <script src="{{ url_for('static', filename='/layouts/index.js') }}"></script>
+  <script>
+    const staticBaseUrl = "{{ url_for('static', filename='') }}";
+  </script>
+  <script src="{{ url_for('static', filename='/components/Navbar/navbar.js') }}"></script>
+</html>

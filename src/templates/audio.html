@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='/assets/arviixzuh.ico') }}"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/index.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/theme.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/webkit.css') }}" />
+    <script src="{{ url_for('static', filename='/layouts/index.js') }}"></script>
+    <title>Audio</title>
+  </head>
+  <body>
+    <style>
+      .radioContainer {
+        gap: 15px;
+        color: var(--title);
+        display: flex;
+        padding: 10px;
+        position: relative;
+        max-width: 500px;
+        max-height: 230px;
+        background: rgb(25, 32, 44);
+        background: linear-gradient(90deg, rgba(25, 32, 44, 1) 0%, rgb(15, 9, 20) 100%);
+        border-radius: 10px;
+      }
+      .radioImg {
+        max-width: 40%;
+        max-height: 100%;
+        object-fit: cover;
+        box-shadow: inset;
+        border-radius: 18px;
+      }
+      .radioHeader {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .radioContent {
+        gap: 15px;
+        width: 100%;
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .radioProgress {
+        gap: 15px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .radioProgressTimer {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+      .radioProgressTimer > span {
+        font-size: 12px;
+      }
+      .o {
+        opacity: 0.7;
+      }
+      .radioControls {
+        gap: 15px;
+        display: flex;
+        font-size: 40px;
+        justify-content: center;
+      }
+      .radioButton {
+        cursor: pointer;
+      }
+      #volumenIcon {
+        font-size: 18px;
+      }
+      .popup {
+        top: -55px;
+        gap: 15px;
+        right: 0px;
+        display: flex;
+        opacity: 0;
+        padding: 10px;
+        z-index: 50;
+        position: absolute;
+        transition: opacity 300ms ease;
+        align-items: center;
+        border-radius: 10px;
+        background-color: var(--primary-variant-1);
+      }
+      .popup.active {
+        opacity: 1;
+      }
+      .radioButton {
+        padding: 5px;
+        font-size: 25px;
+        transition: all 0.3s ease;
+        border-radius: 100%;
+      }
+      .radioButton:hover {
+        background-color: rgba(58, 57, 57, 0.11);
+      }
+      .radioButton:active {
+        transform: scale(0.9);
+      }
+      @media (max-width: 378px) {
+        .radioContainer {
+          max-height: none;
+          flex-direction: column;
+        }
+      }
+    </style>
+    <main>
+      <layout-component title="Audio">
+        <div class="radioContainer">
+          <div class="popup" id="popup">
+            <i class="radioButton bx bx-volume-full" id="volumenIcon"></i>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="1" />
+          </div>
+          <img class="radioImg" src="" alt="" id="radioImg" />
+          <div class="radioContent">
+            <div>
+              <div class="radioHeader">
+                <h4>Daily mix</h4>
+                <i class="radioButton bx bx-dots-horizontal-rounded" id="moreIcon"></i>
+              </div>
+              <span id="musictLength"></span>
+            </div>
+            <h3 id="musicName"></h3>
+            <audio id="audio" src=""></audio>
+            <div class="radioProgress">
+              <input type="range" id="progress" class="progress" min="0" max="100" value="0" />
+              <div class="radioProgressTimer">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime" class="o">0:00</span>
+              </div>
+            </div>
+            <div class="radioControls">
+              <i id="prev" class="radioButton bx bx-skip-previous"></i>
+              <i id="playPause" class="radioButton bx bx-play"></i>
+              <i id="next" class="radioButton bx bx-skip-next"></i>
+            </div>
+          </div>
+        </div>
+      </layout-component>
+    </main>
+  </body>
+  <script>
+    const staticBaseUrl = "{{ url_for('static', filename='') }}"
+  </script>
+  <script>
+    const next = document.getElementById('next')
+    const prev = document.getElementById('prev')
+    const audio = document.getElementById('audio')
+    const popup = document.getElementById('popup')
+    const radioImg = document.getElementById('radioImg')
+    const progress = document.getElementById('progress')
+    const moreIcon = document.getElementById('moreIcon')
+    const musicName = document.getElementById('musicName')
+    const volumenIcon = document.getElementById('volumenIcon')
+    const musictLength = document.getElementById('musictLength')
+    const totalTimeSpan = document.getElementById('totalTime')
+    const volumeControl = document.getElementById('volume')
+    const playPauseButton = document.getElementById('playPause')
+    const currentTimeSpan = document.getElementById('currentTime')
+    let currentMusic = 0
+
+    const playlist = [
+      {
+        img: 'album-2.png',
+        name: 'Rosa pastel',
+        audioURL: 'audio-2.mp3',
+      },
+      {
+        img: 'album-3.png',
+        name: 'Fly me to the moon',
+        audioURL: 'audio-1.mp3',
+      },
+      {
+        img: 'album-1.png',
+        name: 'Let it snow',
+        audioURL: 'audio-3.mp3',
+      },
+    ]
+
+    const updateMusic = (index) => {
+      currentMusic = index
+      const { img, audioURL, name } = playlist[currentMusic]
+      audio.setAttribute('src', `${staticBaseUrl}assets/${audioURL}`)
+      radioImg.setAttribute('src', `${staticBaseUrl}assets/${img}`)
+      musicName.innerText = name
+      musictLength.innerText = `${playlist.length} Canciones`
+      audio.currentTime = 0
+    }
+
+    updateMusic(0)
+
+    const nextMusic = () => {
+      const newIndex = (currentMusic + 1) % playlist.length
+      updateMusic(newIndex)
+      togglePlayPause()
+    }
+
+    const prevMusic = () => {
+      const newIndex = (currentMusic - 1 + playlist.length) % playlist.length
+      updateMusic(newIndex)
+      togglePlayPause()
+    }
+
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60)
+      const secs = Math.floor(seconds % 60)
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+    }
+
+    const changeProgressColor = (percentage, element) => {
+      element.style.background = `linear-gradient(to right, #ffffff ${percentage}%, #555353 ${percentage}%)`
+    }
+
+    const togglePlayPause = () => {
+      if (audio.paused) {
+        audio.play()
+        playPauseButton.classList.replace('bx-play', 'bx-pause')
+      } else {
+        audio.pause()
+        playPauseButton.classList.replace('bx-pause', 'bx-play')
+      }
+    }
+
+    const metadataCallback = () => {
+      const duration = formatTime(audio.duration)
+      totalTimeSpan.textContent = duration
+      progress.max = audio.duration
+    }
+
+    const timeUpdate = () => {
+      progress.value = audio.currentTime
+      currentTimeSpan.textContent = formatTime(audio.currentTime)
+
+      if (audio.currentTime == audio.duration) {
+        audio.currentTime = 0
+        audio.pause()
+        playPauseButton.classList.replace('bx-pause', 'bx-play')
+      }
+
+      const audioPercentage = (audio.currentTime / audio.duration) * 100
+
+      changeProgressColor(audioPercentage, progress)
+    }
+
+    const handleOpenVolumentPopup = () => {
+      popup.classList.toggle('active')
+    }
+
+    const changeVolume = (e) => {
+      let vol = e.target.value
+      audio.volume = vol
+
+      if (vol == 0) {
+        volumenIcon.classList.remove('bx-volume-full')
+        volumenIcon.classList.remove('bx-volume-low')
+        volumenIcon.classList.add('bx-volume')
+      }
+
+      if (vol >= 0.1) {
+        volumenIcon.classList.remove('bx-volume')
+        volumenIcon.classList.add('bx-volume-low')
+      }
+
+      if (vol >= 0.9) {
+        volumenIcon.classList.remove('bx-volume-low')
+        volumenIcon.classList.add('bx-volume-full')
+      }
+
+      changeProgressColor(audio.volume * 100, volumeControl)
+    }
+
+    const handleMute = () => {
+      audio.muted = !audio.muted
+      volumenIcon.classList.toggle('bx-volume-full')
+      volumenIcon.classList.toggle('bx-volume-mute')
+    }
+
+    moreIcon.addEventListener('click', (e) => {
+      e.stopPropagation()
+      popup.classList.toggle('active')
+    })
+
+    document.addEventListener('click', (e) => {
+      if (!popup.contains(e.target) && !volumenIcon.contains(e.target)) {
+        popup.classList.remove('active')
+      }
+    })
+
+    next.addEventListener('click', nextMusic)
+    prev.addEventListener('click', prevMusic)
+    audio.addEventListener('timeupdate', timeUpdate)
+    volumenIcon.addEventListener('click', handleMute)
+    volumeControl.addEventListener('input', changeVolume)
+    audio.addEventListener('loadedmetadata', metadataCallback)
+    playPauseButton.addEventListener('click', togglePlayPause)
+    progress.addEventListener('input', () => {
+      audio.currentTime = progress.value
+    })
+  </script>
+
+  <script src="{{ url_for('static', filename='/components/Navbar/navbar.js') }}"></script>
+</html>

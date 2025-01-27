@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='/assets/arviixzuh.ico') }}"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/index.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/theme.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/webkit.css') }}" />
+    <script>
+      const staticBaseUrl = "{{ url_for('static', filename='') }}"
+    </script>
+    <script src="{{ url_for('static', filename='/layouts/index.js') }}"></script>
+    <title>Drag & drop</title>
+  </head>
+  <style>
+    h3 {
+      color: white;
+    }
+    body {
+      gap: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cuadradoContainer {
+      gap: 10px;
+      display: flex;
+      flex-direction: row;
+    }
+    .cuadrado {
+      gap: 10px;
+      width: 50%;
+      border: 1px solid var(--default);
+      padding: 15px;
+      display: flex;
+      transition: all 300ms ease;
+      border-radius: 8px;
+      flex-direction: column;
+    }
+    .circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 100%;
+      background-color: #479490;
+    }
+  </style>
+  <body>
+    <main>
+      <layout-component title="Drag and drop">
+        <section class="cuadradoContainer">
+          <div class="cuadrado">
+            <div class="circle" draggable="true"></div>
+          </div>
+          <div class="cuadrado">
+            <div class="circle" draggable="true"></div>
+          </div>
+        </section>
+      </layout-component>
+    </main>
+  </body>
+  <script>
+    const circles = document.querySelectorAll('.circle')
+    const containers = document.querySelectorAll('.cuadrado')
+
+    // Variable para rastrear el elemento que se está arrastrando
+    let draggedItem = null
+
+    // Evento para iniciar el drag
+    circles.forEach((circle) => {
+      circle.addEventListener('dragstart', (e) => {
+        draggedItem = e.target // Guardamos el elemento arrastrado
+
+        // Personalizar la imagen de arrastre para que sea el mismo círculo
+        e.dataTransfer.setDragImage(e.target, 15, 15) // El círculo se usa como imagen
+
+        // Opcional: Cambiar la opacidad del círculo durante el arrastre
+        e.target.style.opacity = '0.5'
+      })
+
+      circle.addEventListener('dragend', (e) => {
+        // Restaurar la opacidad del círculo al finalizar el arrastre
+        e.target.style.opacity = '1'
+        draggedItem = null // Limpiar referencia
+      })
+    })
+
+    // Permitir arrastrar sobre los contenedores
+    containers.forEach((container) => {
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault()
+      })
+
+      container.addEventListener('dragenter', (e) => {
+        e.preventDefault()
+        container.style.backgroundColor = 'var(--default)'
+      })
+
+      container.addEventListener('dragleave', () => {
+        container.style.backgroundColor = 'transparent'
+      })
+
+      container.addEventListener('drop', (e) => {
+        e.preventDefault()
+        container.style.backgroundColor = 'transparent'
+        if (draggedItem) {
+          container.appendChild(draggedItem)
+          draggedItem.style.backgroundColor = '#944747'
+        }
+      })
+    })
+  </script>
+  <script
+    defer
+    src="{{ url_for('static', filename='/components/Navbar/navbar.js') }}"
+    lang="javascript"
+  ></script>
+</html>

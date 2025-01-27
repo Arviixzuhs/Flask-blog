@@ -1,0 +1,86 @@
+.articles {
+  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+}
+
+.searchBarContainer {
+  gap: 10px;
+  display: flex;
+  max-width: 300px;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--default);
+  padding-bottom: 5px;
+  justify-content: space-between;
+}
+
+.searchBar {
+  color: var(--text);
+  width: 100%;
+  background-color: transparent;
+}
+
+.articleCardFooter {
+  gap: 10px;
+  display: flex;
+  font-size: 12px;
+}
+
+.articleCardKey {
+  padding: 3px 8px;
+  border-radius: 8px;
+  background-color: var(--default);
+}
+
+.articleCard {
+  color: rgb(238, 236, 236);
+  width: 100%;
+  height: 300px;
+  margin: 0 auto;
+  display: flex;
+  max-width: 290px;
+  background: #191b1f;
+  border-radius: 10px;
+  flex-direction: column;
+}
+
+.articleCardContent {
+  gap: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.articleCardBody > h3 {
+  color: var(--title);
+  font-size: 16px;
+}
+
+.articleCardBody > p {
+  color: var(--title);
+  font-size: 13px;
+}
+
+.articleCardImg {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+@media (max-width: 768px) {
+  .articles {
+    grid-template-columns: 1fr;
+  }
+
+  .articleCard {
+    width: 100%;
+    max-width: none;
+  }
+
+  .searchBarContainer {
+    width: 100%;
+    max-width: none;
+  }
+}

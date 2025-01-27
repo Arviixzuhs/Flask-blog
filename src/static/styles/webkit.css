@@ -1,0 +1,34 @@
+*::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--default);
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+input[type='range']::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  appearance: none;
+  background: var(--primary-variant-1);
+  border-radius: 50%;
+  -webkit-appearance: none;
+}
+
+input[type='range'] {
+  width: 100%;
+  height: 1px;
+  margin-right: 15px;
+  border-radius: 5px;
+  background-image: linear-gradient(#ffffff, #ffffff);
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+}

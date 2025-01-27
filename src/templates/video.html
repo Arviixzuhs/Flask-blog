@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='/assets/arviixzuh.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='/components/Articles/styles.css') }}"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/index.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/theme.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/webkit.css') }}" />
+    <script src="{{ url_for('static', filename='/layouts/index.js') }}"></script>
+    <script>
+      const staticBaseUrl = "{{ url_for('static', filename='') }}"
+    </script>
+    <script src="{{ url_for('static', filename='/components/Navbar/navbar.js') }}"></script>
+    <title>Video</title>
+  </head>
+  <style>
+    video {
+      height: auto;
+      display: block;
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .videoContainer {
+      gap: 10px;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      max-width: 650px;
+      border-radius: 12px;
+      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .videoContainer:hover .controls {
+      opacity: 1;
+    }
+    .controls {
+      gap: 10px;
+      width: 100%;
+      color: var(--icon);
+      bottom: 0;
+      opacity: 0;
+      display: flex;
+      padding: 10px;
+      position: absolute;
+      transition: opacity 0.3s ease;
+      margin-top: -40px;
+      background: rgba(25, 32, 44, 0.4);
+      background: linear-gradient(90deg, rgba(25, 32, 44, 0.6) 0%, rgba(15, 9, 20, 0.6) 100%);
+      align-items: center;
+      backdrop-filter: blur(15px);
+    }
+    .controls > i {
+      font-size: 22px;
+    }
+    .progress {
+      cursor: pointer;
+      flex-grow: 1;
+    }
+    .progress-bar {
+      width: 100%;
+    }
+    .playPause,
+    .mute {
+      font-size: 30px;
+      cursor: pointer;
+    }
+    .time {
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+    #volume {
+      max-width: 80px;
+    }
+  </style>
+  <body>
+    <main>
+      <layout-component title="Video">
+        <div class="videoContainer">
+          <video id="video">
+            <source src="{{ url_for('static', filename='/assets/video.mp4') }}" type="video/mp4" />
+          </video>
+          <div class="controls">
+            <i class="playPause bx bx-play" id="play"></i>
+            <input type="range" id="progress" class="progress" min="0" max="100" value="0" />
+            <span class="time" id="currentTime">0:00</span>
+            <span class="time">/</span>
+            <span class="time" id="duration">0:00</span>
+            <i class="mute bx bx-volume-full" id="volumenIcon"></i>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="1" />
+          </div>
+        </div>
+      </layout-component>
+    </main>
+  </body>
+  <script>
+    const video = document.getElementById('video')
+    const playPause = document.getElementById('play')
+    const durationEl = document.getElementById('duration')
+    const volumenIcon = document.getElementById('volumenIcon')
+    const progressBar = document.getElementById('progress')
+    const volumeControl = document.getElementById('volume')
+    const currentTimeEl = document.getElementById('currentTime')
+
+    const toggleIcon = () => {
+      playPause.classList.toggle('bx-pause')
+      playPause.classList.toggle('bx-play')
+    }
+
+    const playPauseVideo = () => {
+      if (video.paused) {
+        video.play()
+      } else {
+        video.pause()
+      }
+      toggleIcon()
+    }
+
+    const changeProgressColor = (percentage, element) => {
+      element.style.background = `linear-gradient(to right, #ffffff ${percentage}%, #555353 ${percentage}%)`
+    }
+
+    const updateProgress = () => {
+      const videoPercentage = (video.currentTime / video.duration) * 100
+
+      progressBar.value = videoPercentage
+
+      currentTimeEl.textContent = formatTime(video.currentTime)
+
+      changeProgressColor(videoPercentage, progressBar)
+
+      if (video.currentTime == video.duration) {
+        video.currentTime = 0
+        video.pause()
+        playPause.classList.replace('bx-pause', 'bx-play')
+      }
+    }
+
+    const setVideoProgress = () => {
+      video.currentTime = (progressBar.value / 100) * video.duration
+    }
+
+    const formatTime = (time) => {
+      const minutes = Math.floor(time / 60)
+      const seconds = Math.floor(time % 60)
+      return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`
+    }
+
+    const metadataCallback = () => {
+      durationEl.textContent = formatTime(video.duration)
+    }
+
+    const handleMute = () => {
+      video.muted = !video.muted
+      volumenIcon.classList.toggle('bx-volume-full')
+      volumenIcon.classList.toggle('bx-volume-mute')
+    }
+
+    const changeVolume = (e) => {
+      let vol = e.target.value
+      video.volume = vol
+
+      if (vol == 0) {
+        volumenIcon.classList.remove('bx-volume-full')
+        volumenIcon.classList.remove('bx-volume-low')
+        volumenIcon.classList.add('bx-volume')
+      }
+
+      if (vol >= 0.1) {
+        volumenIcon.classList.remove('bx-volume')
+        volumenIcon.classList.add('bx-volume-low')
+      }
+
+      if (vol >= 0.9) {
+        volumenIcon.classList.remove('bx-volume-low')
+        volumenIcon.classList.add('bx-volume-full')
+      }
+
+      changeProgressColor(video.volume * 100, volumeControl)
+    }
+
+    video.addEventListener('click', playPauseVideo)
+    volumenIcon.addEventListener('click', handleMute)
+    playPause.addEventListener('click', playPauseVideo)
+    video.addEventListener('timeupdate', updateProgress)
+    volumeControl.addEventListener('input', changeVolume)
+    progressBar.addEventListener('input', setVideoProgress)
+    video.addEventListener('loadedmetadata', metadataCallback)
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        playPauseVideo()
+      }
+    })
+  </script>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='/assets/arviixzuh.ico') }}"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/index.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/theme.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/webkit.css') }}" />
+    <script>
+      const staticBaseUrl = "{{ url_for('static', filename='') }}"
+    </script>
+    <script src="{{ url_for('static', filename='/layouts/index.js') }}"></script>
+    <title>Tic Tac Toe</title>
+  </head>
+  <style>
+    h1 {
+      margin: 20px 0;
+    }
+    #board {
+      width: max-content;
+      display: grid;
+      grid-gap: 5px;
+      grid-template-columns: repeat(3, 100px);
+    }
+    .tttContainer {
+      gap: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+      display: flex;
+      font-size: 2em;
+      align-items: center;
+      border-radius: 5px;
+      justify-content: center;
+      background-color: var(--default);
+    }
+    .tttSide {
+      gap: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cell.taken {
+      color: var(--title);
+      cursor: not-allowed;
+    }
+    .cell.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    #status {
+      font-size: 1.2em;
+    }
+    #reset {
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      padding: 10px 20px;
+      width: fit-content;
+      font-size: 1em;
+      border-radius: 5px;
+      background-color: var(--primary);
+    }
+  </style>
+  <body>
+    <main>
+      <layout-component title="Tic Tac Toe">
+        <div class="tttContainer">
+          <div class="tttSide">
+            <p id="tttStatus" class="title">Turno: X</p>
+            <button id="reset" style="display: none">Reiniciar</button>
+          </div>
+          <div id="board"></div>
+        </div>
+      </layout-component>
+    </main>
+  </body>
+  <script>
+    const board = document.getElementById('board')
+    const tttStatus = document.getElementById('tttStatus')
+    const resetBtn = document.getElementById('reset')
+    let currentPlayer = 'X'
+    let moves = 0
+
+    const checkWinner = () => {
+      const cells = [...document.querySelectorAll('.cell')]
+      const wins = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ]
+      return wins.some((comb) => comb.every((i) => cells[i].textContent === currentPlayer))
+    }
+
+    const disableBoard = () => {
+      const cells = document.querySelectorAll('.cell')
+      cells.forEach((cell) => cell.classList.add('disabled'))
+    }
+
+    const enableBoard = () => {
+      const cells = document.querySelectorAll('.cell')
+      cells.forEach((cell) => cell.classList.remove('disabled'))
+    }
+
+    const resetGame = () => {
+      board.innerHTML = ''
+      tttStatus.textContent = 'Turno: X'
+      resetBtn.style.display = 'none'
+      currentPlayer = 'X'
+      moves = 0
+      enableBoard() // Habilitar el tablero
+      initBoard()
+    }
+
+    const initBoard = () => {
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div')
+        cell.className = 'cell'
+        cell.addEventListener('click', () => {
+          if (cell.textContent || tttStatus.textContent.includes('Winner')) return
+          cell.textContent = currentPlayer
+          cell.classList.add('taken')
+          moves++
+          if (checkWinner()) {
+            tttStatus.textContent = `Ganador: ${currentPlayer}`
+            resetBtn.style.display = 'block'
+            disableBoard() // Deshabilitar tablero
+          } else if (moves === 9) {
+            tttStatus.textContent = '¡Empate!'
+            resetBtn.style.display = 'block'
+            disableBoard() // Deshabilitar tablero
+          } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X'
+            tttStatus.textContent = `Turno: ${currentPlayer}`
+          }
+        })
+        board.appendChild(cell)
+      }
+    }
+
+    resetBtn.addEventListener('click', resetGame)
+
+    initBoard()
+  </script>
+  <script src="{{ url_for('static', filename='/components/Navbar/navbar.js') }}"></script>
+</html>
